@@ -11,7 +11,12 @@ function setLanguage(language) {
   updateMenuLabel();
   document.querySelector('.round-link').setAttribute('aria-label', language === 'de' ? 'Ausgewählte Arbeiten ansehen' : 'Explore selected work');
   document.querySelector('.language').setAttribute('aria-label', language === 'de' ? 'Sprache' : 'Language');
-  document.querySelectorAll('.project-image').forEach(link => { const name = link.querySelector('img').alt.replace('Screenshot of the ', '').replace(' website', ''); link.setAttribute('aria-label', language === 'de' ? `${name} besuchen (öffnet in einem neuen Tab)` : `Visit ${name} (opens in a new tab)`); });
+  document.querySelectorAll('.project-image').forEach(link => {
+    const img = link.querySelector('img');
+    const name = img.dataset.altEn.replace('Screenshot of the ', '').replace(' website', '');
+    img.alt = language === 'de' ? img.dataset.altDe : img.dataset.altEn;
+    link.setAttribute('aria-label', language === 'de' ? `${name} besuchen (öffnet in einem neuen Tab)` : `Visit ${name} (opens in a new tab)`);
+  });
 
   const result = document.querySelector('.form-result');
   if (!result.hidden) result.textContent = language === 'de' ? 'Vorschau abgeschlossen. Diese Demo hat keine Nachricht gesendet oder gespeichert.' : 'Preview complete. This demo did not send or save a message.';
@@ -25,3 +30,19 @@ menu.addEventListener('click', () => { const open = menu.getAttribute('aria-expa
 nav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => { nav.classList.remove('open'); menu.setAttribute('aria-expanded', 'false'); updateMenuLabel(); }));
 document.querySelector('#demo-form').addEventListener('submit', event => { event.preventDefault(); const result = document.querySelector('.form-result'); result.hidden = false; result.textContent = currentLanguage === 'de' ? 'Vorschau abgeschlossen. Diese Demo hat keine Nachricht gesendet oder gespeichert.' : 'Preview complete. This demo did not send or save a message.'; });
 
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') {
+    nav.classList.remove('open');
+    menu.setAttribute('aria-expanded', 'false');
+    updateMenuLabel();
+    menu.focus();
+  }
+});
+window.matchMedia('(min-width: 601px)').addEventListener('change', event => {
+  if (event.matches) {
+    nav.classList.remove('open');
+    menu.setAttribute('aria-expanded', 'false');
+    updateMenuLabel();
+  }
+});
